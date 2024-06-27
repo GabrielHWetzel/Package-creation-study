@@ -7,8 +7,19 @@ from pathlib import Path
 
 def generate(invoices_path, pdfs_path, image_path, product_id, product_name,
              amount_purchased, price_per_unit, total_price):
+    """
+    Converts invoice Excel files into PDF invoices.
+    :param invoices_path:
+    :param pdfs_path:
+    :param image_path:
+    :param product_id:
+    :param product_name:
+    :param amount_purchased:
+    :param price_per_unit:
+    :param total_price:
+    :return:
+    """
     invoices = glob.glob(f"{invoices_path}/*.xlsx")
-
     for invoice in invoices:
 
         # Initiate PDF
@@ -48,22 +59,23 @@ def generate(invoices_path, pdfs_path, image_path, product_id, product_name,
             pdf.cell(w=35, h=8, txt=str(row[price_per_unit]), border=1)
             pdf.cell(w=30, h=8, txt=str(row[total_price]), border=1, ln=1)
 
-        total_price = df["total_price"].sum()
+        total_price_sum = df[total_price].sum()
         pdf.set_font(family="Times", size=10)
         pdf.cell(w=30, h=8, border=1)
         pdf.cell(w=60, h=8, border=1)
         pdf.cell(w=35, h=8, border=1)
         pdf.cell(w=35, h=8, border=1)
-        pdf.cell(w=30, h=8, txt=str(total_price), border=1, ln=1)
+        pdf.cell(w=30, h=8, txt=str(total_price_sum), border=1, ln=1)
         pdf.ln(h=5)
 
         # Bottom
         pdf.set_font(family="Times", size=12, style="B")
-        pdf.cell(w=30, h=10, txt=f"The total price is {total_price}", ln=1)
+        pdf.cell(w=30, h=10, txt=f"The total price is {total_price_sum}", ln=1)
 
         pdf.set_font(family="Times", size=16, style="B")
         pdf.cell(w=35, h=10, txt="PythonHow")
         pdf.image(image_path, w=10)
 
-        os.makedirs(pdfs_path)
+        if not os.path.exists(pdfs_path):
+            os.makedirs(pdfs_path)
         pdf.output(f"{pdfs_path}/{filename}.pdf")
